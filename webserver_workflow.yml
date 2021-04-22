@@ -1,0 +1,30 @@
+---
+- name: Running HTTPD Workflow
+  hosts: all
+  become: true
+  gather_facts: False
+  tasks:
+  - name: Installing HTTPD and Firewalld
+    yum:
+      name: 
+        - httpd
+        - firewalld
+      state: latest
+  - name: Creating index.html
+    copy:
+      src: files/index.html
+      dest: /var/www/html/index.html
+  - name: Starting and Enabling HTTPD and Firewalld
+    service:
+      name: "{{ item }}"
+      state: started
+      enabled: true
+    loop:
+      - httpd
+      - firewalld
+  - name: Adding http Service into Firewalld
+    firewalld:
+      service: http
+      permanent: true
+      immediate: true
+      state: enabled
